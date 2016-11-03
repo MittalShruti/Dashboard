@@ -126,7 +126,7 @@ var fmaxDate = fourDim.top(1)[0]["date_of_joining"];
 
 var numberRecordsND = dc.numberDisplay("#number-records-nd");
 var timeChart = dc.barChart("#time-chart");  //first  
-var svg = dc.barChart("#Chart")  //third
+var svg = dc.barChart("#Chart") ; //third
 var timeXChart = dc.barChart("#time-chartX");  //second
 var timeYChart = dc.barChart("#time-chartY");  //four 
 
@@ -231,36 +231,36 @@ svg
     .elasticY(true);
     // svg.renderLabel(true);
 
-//     svg.renderlet(function (chart) {
+    svg.renderlet(function (chart) {
 
-//     //Check if labels exist
-//     var gLabels = chart.select(".labels");
-//     if (gLabels.empty()){
-//         gLabels = chart.select(".chart-body").append('g').classed('labels', true);
-//     }
+    //Check if labels exist
+    var gLabels = chart.select(".labels");
+    if (gLabels.empty()){
+        gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+    }
 
-//     var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+    var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
 
-//     gLabelsData.exit().remove(); //Remove unused elements
-//     gLabelsData.enter().append("text") //Add new elements
+    gLabelsData.exit().remove(); //Remove unused elements
+    gLabelsData.enter().append("text") //Add new elements
 
-//     gLabelsData
-//     .attr('text-anchor', 'middle')
-//     .attr('fill', 'white')
-//     .text(function(d){
-//         text_object =  d3.select(d).datum().y
-//         console.log(text_object)
-//         return text_object
-//     })
-//     .attr('x', function(d){ 
-//         return +d.getAttribute('x') + (d.getAttribute('width')/2); 
-//     })
-//     .attr('y', function(d){ return +d.getAttribute('y') + 15; })
-//     .attr('style', function(d){
-//         if (+d.getAttribute('height') < 18) return "display:none";
-//     });
+    gLabelsData
+    .attr('text-anchor', 'middle')
+    .attr('fill', 'white')
+    .text(function(d){
+        text_object =  d3.select(d).datum().y
+        console.log(text_object)
+        return text_object
+    })
+    .attr('x', function(d){ 
+        return +d.getAttribute('x') + (d.getAttribute('width')/2); 
+    })
+    .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+    .attr('style', function(d){
+        if (+d.getAttribute('height') < 18) return "display:none";
+    });
 
-// })
+})
     // svg.render();
 
 
