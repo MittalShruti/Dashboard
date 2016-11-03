@@ -1,5 +1,5 @@
 queue()
-    .defer(d3.json, "/data2")
+    .defer(d3.json, "/data")
     .await(makeCharts);
 
 // var locationdDim = ndx.dimension(function(d) { return d["date_of_run"]; });
