@@ -44,6 +44,7 @@ var ndx = crossfilter(data);
 
 var fourDim = ndx.dimension(function(d) { return d["date_of_joining"]; }); 
 var XDimension = ndx.dimension(function (d) {return d["date_of_run"];});
+var XpDimension = ndx.dimension(function (d) {return d["date_of_run"];});
 var range = ndx.dimension(function (d) {return d["date_of_run"];});
 var dateDim = ndx.dimension(function (d) {return d["date_of_run"];});
 var secDim = ndx.dimension(function(d) { return d["date_of_run"]; }); 
@@ -65,7 +66,30 @@ function reduceRemove(p, d) {
   return p;
 },
 function reduceInitial() {
-  return { };})
+  return { //p["6-10"]:0, p["10-14"]:0, p["14-18"]:0, p["18-22"]:0, p["22-2"]:0, p["2-6"]:0 
+  "6-10" : 0 , "10-14":0, "14-18":0, "18-22":0, "22-2":0, "2-6":0
+};})
+
+var YpDimension = XpDimension.group().reduce(
+function reduceAdd(p, d) {
+  p[d["running_slot"]] = (p[d["running_slot"]]|| 0) + 1;
+  p["6-10"] = p["6-10"]*100/(p["6-10"]+p["10-14"]+p["14-18"]+p["18-22"]+p["22-2"]+p["2-6"]);
+  p["10-14"] = p["10-14"]*100/(p["6-10"]+p["10-14"]+p["14-18"]+p["18-22"]+p["22-2"]+p["2-6"]);
+  p["14-18"] = p["14-18"]*100/(p["6-10"]+p["10-14"]+p["14-18"]+p["18-22"]+p["22-2"]+p["2-6"]);
+  p["18-22"] = p["18-22"]*100/(p["6-10"]+p["10-14"]+p["14-18"]+p["18-22"]+p["22-2"]+p["2-6"]);
+  p["22-2"] = p["22-2"]*100/(p["6-10"]+p["10-14"]+p["14-18"]+p["18-22"]+p["22-2"]+p["2-6"]); 
+  p["2-6"] = p["2-6"]*100/(p["6-10"]+p["10-14"]+p["14-18"]+p["18-22"]+p["22-2"]+p["2-6"]); 
+  return p;
+},
+function reduceRemove(p, d) {
+  p[d["running_slot"]] = (p[d["running_slot"]]|| 0)-1;
+  return p;
+},
+function reduceInitial() {
+  return {  
+  "6-10" : 0 , "10-14":0, "14-18":0, "18-22":0, "22-2":0, "2-6":0
+};})
+
 
 var num_unique_ids_by_date = secDim.group()
     .reduce(
@@ -129,6 +153,7 @@ var timeChart = dc.barChart("#time-chart");  //first
 var svg = dc.barChart("#Chart") ; //third
 var timeXChart = dc.barChart("#time-chartX");  //second
 var timeYChart = dc.barChart("#time-chartY");  //four 
+//var timepercent = dc.barChart("#percent-chart") ;
 
 numberRecordsND
         .formatNumber(d3.format("d"))
@@ -138,7 +163,7 @@ numberRecordsND
 timeChart
         .width(950)
         .height(300)
-        .margins({top: 40, right: 50, bottom: 40, left: 50})
+        .margins({top: 80, right: 80, bottom: 40, left: 50})
         .dimension(dateDim)
         .xUnits(d3.time.days)
         .group(numRecordsByDate)
@@ -149,13 +174,17 @@ timeChart
         .renderHorizontalGridLines(true)
         .renderVerticalGridLines(true)
         .renderLabel(true)
+        .brushOn(false)
+        .title(function(d) {
+            return (new Date(d.key).toDateString()) + ': ' + d.value;
+    })
       //  .xAxis().ticks(d3.time.days,1)
         .yAxis() 
 
 timeXChart
     .width(950)
     .height(300)
-    .margins({top: 40, right: 50,bottom: 40, left: 50})
+    .margins({top: 80, right: 80,bottom: 40, left: 50})
     .dimension(secDim)
     .xUnits(d3.time.days)
     .group(num_unique_ids_by_date)
@@ -168,103 +197,91 @@ timeXChart
     .xAxisLabel("Unique Runners Daily")
     .renderHorizontalGridLines(true)
     .renderVerticalGridLines(true) 
-    .renderLabel(true)   
+    .renderLabel(true) 
+    .brushOn(false)
+    .title(function(d) {
+        return (new Date(d.key).toDateString()) + ': ' + d.value.id_count;
+    })  
     // .elasticX(true) 
     .yAxis()     
 
 timeYChart
     .width(950)
     .height(300)
-    .margins({top: 40, right: 50,bottom: 40, left: 50})
+    .margins({top: 80, right: 80,bottom: 40, left: 50})
     .dimension(fourDim)
     .group(fnum_unique_ids_by_date)
     .valueAccessor(function(d){
         return d.value.id_count;
     })
     .transitionDuration(500)
-    // .x(d3.scale.ordinal().domain(fourDim))
-    // .xUnits(dc.units.ordinal)
     .x(d3.time.scale().domain([fminDate, fmaxDate]))
     .xUnits(d3.time.days)
     .xAxisLabel("Newly Registered Users Daily")
     .renderHorizontalGridLines(true)
     .renderVerticalGridLines(true)
+    .brushOn(false)
+    .title(function(d) {
+        return (new Date(d.key).toDateString()) + ': ' + d.value.id_count;
+    })
     // .yAxis()
     .renderLabel(true)
     
 
-function sel_stack(valueKey) {
-    return function(d){
-        return d.value[valueKey];
-    };
-}
-
 svg
     .width(950)
     .height(300)
-    .margins({top: 40, right: 50,bottom: 40, left: 50})
+    .margins({top: 80, right: 80,bottom: 40, left: 50})
     .dimension(XDimension)
-    
-    // .stack(YDimension,"10-14",function(d) {return d.value["10-14"];})
-    // .stack(YDimension,"14-18",function(d) {return d.value["14-18"];})
-    // .stack(YDimension,"18-22",function(d) {return d.value["18-22"];})
-    // .stack(YDimension,"22-2",function(d) {return d.value["22-2"];})
-    // .stack(YDimension,"2-6",function(d) {return d.value["2-6"];}) 
     .transitionDuration(500)
     .x(d3.time.scale().domain([minDate, maxDate]))
     .xUnits(d3.time.days)
-
- //    .xUnits(dc.units.ordinal)
- //    .x(d3.scale.ordinal().domain(XDimension))
     .xAxisLabel("Time Of Run Daily")
     .renderHorizontalGridLines(true)
     .renderVerticalGridLines(true)
-    .legend(dc.legend().x(100).y(20).gap(5).horizontal(true));
-
-    svg.group(YDimension, "2-6") 
-    .valueAccessor(function(d) {return d.value["2-6"];})
-    .stack(YDimension,"6-10", sel_stack("6-10"))
-    .stack(YDimension, "10-14", sel_stack("10-14"))
-    .stack(YDimension, "14-18", sel_stack("14-18"))
-    .stack(YDimension, "18-22", sel_stack("18-22"))
-    .stack(YDimension, "22-2", sel_stack("22-2"))
+    .legend(dc.legend().x(100).y(20).gap(5).horizontal(true))
+    .brushOn(false)
+    .clipPadding(10)
+    .title(function(d) {
+        return (new Date(d.key).toDateString()) + '[' + this.layer + ']: ' + d.value[this.layer];
+    })
+    svg.group(YDimension, "6-10") 
+    .valueAccessor(function(d) {return d.value["6-10"];})
+    .stack(YDimension,"10-14",function(d) {return d.value["10-14"];})
+    .stack(YDimension,"14-18",function(d) {return d.value["14-18"];})
+    .stack(YDimension,"18-22",function(d) {return d.value["18-22"];})
+    .stack(YDimension,"22-2",function(d) {return d.value["22-2"];})
+    .stack(YDimension,"2-6",function(d) {return d.value["2-6"];}) 
     .elasticY(true);
-    // svg.renderLabel(true);
-
-    svg.renderlet(function (chart) {
-
-    //Check if labels exist
-    var gLabels = chart.select(".labels");
-    if (gLabels.empty()){
-        gLabels = chart.select(".chart-body").append('g').classed('labels', true);
-    }
-
-    var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
-
-    gLabelsData.exit().remove(); //Remove unused elements
-    gLabelsData.enter().append("text") //Add new elements
-
-    gLabelsData
-    .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
-    .text(function(d){
-        text_object =  d3.select(d).datum().y
-        console.log(text_object)
-        return text_object
-    })
-    .attr('x', function(d){ 
-        return +d.getAttribute('x') + (d.getAttribute('width')/2); 
-    })
-    .attr('y', function(d){ return +d.getAttribute('y') + 15; })
-    .attr('style', function(d){
-        if (+d.getAttribute('height') < 18) return "display:none";
-    });
-
-})
-    // svg.render();
+    svg.renderLabel(true);
 
 
-
+// timepercent    
+//     .width(950)
+//     .height(500)
+//     .margins({top: 80, right: 80,bottom: 40, left: 50})
+//     .dimension(XpDimension)
+//     .transitionDuration(500)
+//     .x(d3.time.scale().domain([minDate, maxDate]))
+//     .xUnits(d3.time.days)
+//     .xAxisLabel("Time Of Run Daily (%age-wise split)")
+//     .renderHorizontalGridLines(true)
+//     .renderVerticalGridLines(true)
+//     .legend(dc.legend().x(100).y(10).gap(5).horizontal(true))
+//     .brushOn(false)
+//     .clipPadding(10)
+//     .title(function(d) {
+//         return (new Date(d.key).toDateString()) + '[' + this.layer + ']: ' + d.value[this.layer]+'%';
+//     })
+//     timepercent.group(YpDimension, "6-10") 
+//     .valueAccessor(function(d) {return d.value["6-10"];})
+//     .stack(YpDimension,"10-14",function(d) {return d.value["10-14"];})
+//     .stack(YpDimension,"14-18",function(d) {return d.value["14-18"];})
+//     .stack(YpDimension,"18-22",function(d) {return d.value["18-22"];})
+//     .stack(YpDimension,"22-2",function(d) {return d.value["22-2"];})
+//     .stack(YpDimension,"2-6",function(d) {return d.value["2-6"];}) 
+//     .elasticY(true);
+    // timepercent.renderLabel(true);
 
 
 dc.renderAll();
