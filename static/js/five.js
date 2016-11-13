@@ -148,6 +148,12 @@ var fmaxDate = fourDim.top(1)[0]["date_of_joining"];
 
 
 
+// console.log(ndmonth);
+
+
+// console.log(ndweek);
+
+
 var numberRecordsND = dc.numberDisplay("#number-records-nd");
 var timeChart = dc.barChart("#time-chart");  //first  
 var svg = dc.barChart("#Chart") ; //third
@@ -155,20 +161,30 @@ var timeXChart = dc.barChart("#time-chartX");  //second
 var timeYChart = dc.barChart("#time-chartY");  //four 
 //var timepercent = dc.barChart("#percent-chart") ;
 
+
+newdate1 = new Date(maxDate);
+newdate1.setDate(newdate1.getDate() - 7);
+ndweek = new Date(newdate1);
+
+newdate = new Date(fmaxDate);
+newdate.setDate(newdate.getDate() - 7);
+fndweek = new Date(newdate) ;
+
+
 numberRecordsND
         .formatNumber(d3.format("d"))
         .valueAccessor(function(d){return d; })
         .group(all);
 
 timeChart
-        .width(950)
+//        .width(1270)
         .height(300)
         .margins({top: 80, right: 80, bottom: 40, left: 50})
         .dimension(dateDim)
         .xUnits(d3.time.days)
         .group(numRecordsByDate)
         .transitionDuration(500)
-        .x(d3.time.scale().domain([minDate, maxDate]))
+        .x(d3.time.scale().domain([ndweek, maxDate]))
         .elasticY(true)
         .xAxisLabel("No. Of Runs Daily")
         .renderHorizontalGridLines(true)
@@ -182,7 +198,7 @@ timeChart
         .yAxis() 
 
 timeXChart
-    .width(950)
+//    .width(1270)
     .height(300)
     .margins({top: 80, right: 80,bottom: 40, left: 50})
     .dimension(secDim)
@@ -192,7 +208,7 @@ timeXChart
         return d.value.id_count;
     })
     .transitionDuration(500)
-    .x(d3.time.scale().domain([minDate, maxDate]))
+    .x(d3.time.scale().domain([ndweek, maxDate]))
     .elasticY(true)
     .xAxisLabel("Unique Runners Daily")
     .renderHorizontalGridLines(true)
@@ -206,7 +222,6 @@ timeXChart
     .yAxis()     
 
 timeYChart
-    .width(950)
     .height(300)
     .margins({top: 80, right: 80,bottom: 40, left: 50})
     .dimension(fourDim)
@@ -215,8 +230,9 @@ timeYChart
         return d.value.id_count;
     })
     .transitionDuration(500)
-    .x(d3.time.scale().domain([fminDate, fmaxDate]))
+    .x(d3.time.scale().domain([fndweek, fmaxDate]))
     .xUnits(d3.time.days)
+    .elasticY(true)
     .xAxisLabel("Newly Registered Users Daily")
     .renderHorizontalGridLines(true)
     .renderVerticalGridLines(true)
@@ -224,17 +240,16 @@ timeYChart
     .title(function(d) {
         return (new Date(d.key).toDateString()) + ': ' + d.value.id_count;
     })
-    // .yAxis()
-    .renderLabel(true)
+    .renderLabel(true);
+    
     
 
 svg
-    .width(950)
     .height(300)
     .margins({top: 80, right: 80,bottom: 40, left: 50})
     .dimension(XDimension)
     .transitionDuration(500)
-    .x(d3.time.scale().domain([minDate, maxDate]))
+    .x(d3.time.scale().domain([ndweek, maxDate]))
     .xUnits(d3.time.days)
     .xAxisLabel("Time Of Run Daily")
     .renderHorizontalGridLines(true)
@@ -285,6 +300,47 @@ svg
 
 
 dc.renderAll();
+
+
+$('#week_button').on('click', function(){
+
+
+
+timeChart.x(d3.time.scale().domain([ndweek,maxDate]));
+svg.x(d3.time.scale().domain([ndweek, maxDate]));
+timeXChart.x(d3.time.scale().domain([ndweek, maxDate]));
+timeYChart.x(d3.time.scale().domain([fndweek, maxDate]));
+dc.redrawAll();
+});
+
+
+
+$('#month_button').on('click', function(){
+
+newdate1 = new Date(maxDate);
+newdate1.setDate(newdate1.getDate() - 30);
+ndmonth = new Date(newdate1);
+
+newdate = new Date(fmaxDate);
+newdate.setDate(newdate.getDate() - 30);
+fndmonth = new Date(newdate) ;
+
+timeChart.x(d3.time.scale().domain([ndmonth,maxDate]));
+svg.x(d3.time.scale().domain([ndmonth, maxDate]));
+timeXChart.x(d3.time.scale().domain([ndmonth, maxDate]));
+timeYChart.x(d3.time.scale().domain([fndmonth, maxDate]));
+dc.redrawAll();
+});
+
+$('#reset_button').on('click', function(){
+
+timeChart.x(d3.time.scale().domain([minDate,maxDate]));
+svg.x(d3.time.scale().domain([minDate, maxDate]));
+timeXChart.x(d3.time.scale().domain([minDate, maxDate]));
+timeYChart.x(d3.time.scale().domain([fminDate, maxDate]));
+dc.redrawAll();
+});
+
 };
 }
 render(false);

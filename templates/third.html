@@ -7,6 +7,14 @@
 <body class="application">
 
 <div align="center">
+<button type="button" id="week_button" value="7">7 Days</button>
+<button type="button" id="month_button" value="30">30 Days</button>
+<button type="button" id="reset_button" value="All">All</button>
+</div>
+
+<br>
+
+<div align="center">
     From : <input type="date" name="field1" id="field1" /> To : <input type="date" name="field2" id="field2" /><br /><br />
     <input type="button" onclick="render(true)" value="Submit" />
 </div>
@@ -22,7 +30,7 @@
                 Time Of Run Daily
 </div> -->
 <div class="chart-stage">
-<div id="Chart"></div>
+<div id="Chart" style="width:100%"></div>
 </div>
 </div>
 </div>
@@ -40,7 +48,7 @@
                 No. Of Runs Daily
     </div> -->
 <div class="chart-stage">
-<div id="time-chart"></div>
+<div id="time-chart" style="width:100%"></div>
 </div>
 </div>
 </div>
@@ -57,7 +65,7 @@
                 Unique Runners Daily
 	</div> -->
 <div class="chart-stage">
-	<div id="time-chartX"></div>
+	<div id="time-chartX" style="width:100%"></div>
 </div>
 </div>
 </div>
@@ -78,7 +86,7 @@
     </div> -->
 <div class="chart-stage">
 <br>
-    <div id="time-chartY"></div>
+    <div id="time-chartY" style="width:100%"></div>
 </div>
 </div>
 </div>

@@ -2,7 +2,9 @@
     font-size: 55px;
 }
 
-.dc-chart g.row text {
-    fill: black;
 
+
+#time-chart {
+/*  clear: both;*/
+  width: "100%";
 }
